@@ -1,0 +1,478 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "osint://entity-schema.json",
+  "title": "OSINT Investigation Entity Schema v2.0",
+  "description": "Comprehensive schema for tracking entities, relationships, and evidence in OSINT investigations",
+  
+  "definitions": {
+    "confidenceLevel": {
+      "type": "string",
+      "enum": ["CERTAIN", "HIGH", "MEDIUM", "LOW", "UNCERTAIN", "DISPUTED"],
+      "description": "Confidence in the accuracy of the data"
+    },
+    
+    "evidenceType": {
+      "type": "string", 
+      "enum": ["DIRECT", "INFERRED", "CORROBORATED", "CONFLICTING", "HEARSAY"],
+      "description": "Type of evidence supporting this data"
+    },
+    
+    "sourceReliability": {
+      "type": "string",
+      "enum": ["A", "B", "C", "D", "E", "F"],
+      "description": "A=Completely reliable, B=Usually reliable, C=Fairly reliable, D=Not usually reliable, E=Unreliable, F=Cannot be judged"
+    },
+    
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp"
+    },
+    
+    "uuid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+      "description": "UUID v4 identifier"
+    }
+  },
+
+  "type": "object",
+  "required": ["version", "investigation_id", "created_at", "entities", "relationships"],
+  
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "2.0.0",
+      "description": "Schema version"
+    },
+    
+    "investigation_id": {
+      "$ref": "#/definitions/uuid",
+      "description": "Unique investigation identifier"
+    },
+    
+    "name": {
+      "type": "string",
+      "maxLength": 256,
+      "description": "Investigation name/title"
+    },
+    
+    "description": {
+      "type": "string",
+      "maxLength": 4000,
+      "description": "Investigation summary and objectives"
+    },
+    
+    "classification": {
+      "type": "string",
+      "enum": ["OPEN", "CONFIDENTIAL", "SENSITIVE", "RESTRICTED"],
+      "default": "OPEN",
+      "description": "Investigation classification level"
+    },
+    
+    "created_at": {
+      "$ref": "#/definitions/timestamp"
+    },
+    
+    "modified_at": {
+      "$ref": "#/definitions/timestamp"
+    },
+    
+    "entities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/entity"
+      }
+    },
+    
+    "relationships": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/relationship"
+      }
+    },
+    
+    "evidence_chains": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/evidenceChain"
+      }
+    },
+    
+    "audit_log": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/auditEntry"
+      }
+    },
+    
+    "session_metadata": {
+      "type": "object",
+      "properties": {
+        "search_count": { "type": "integer", "minimum": 0 },
+        "entity_add_count": { "type": "integer", "minimum": 0 },
+        "relationship_add_count": { "type": "integer", "minimum": 0 },
+        "duration_seconds": { "type": "integer", "minimum": 0 },
+        "auto_save_enabled": { "type": "boolean" },
+        "last_auto_save": { "$ref": "#/definitions/timestamp" }
+      }
+    },
+    
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    }
+  },
+
+  "definitions": {
+    "entity": {
+      "type": "object",
+      "required": ["id", "type", "value", "created_at"],
+      
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/uuid"
+        },
+        
+        "type": {
+          "type": "string",
+          "enum": [
+            "PERSON",
+            "ORGANIZATION", 
+            "DOMAIN",
+            "EMAIL",
+            "USERNAME",
+            "IP_ADDRESS",
+            "IP_RANGE",
+            "PHONE",
+            "LOCATION",
+            "DEVICE",
+            "DOCUMENT",
+            "IMAGE",
+            "EVENT",
+            "URL",
+            "CRYPTO_ADDRESS",
+            "ASN",
+            "TECHNOLOGY",
+            "CUSTOM"
+          ]
+        },
+        
+        "value": {
+          "type": "string",
+          "description": "Primary identifier value"
+        },
+        
+        "display_name": {
+          "type": "string",
+          "description": "Human-readable name"
+        },
+        
+        "aliases": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Alternative names/identifiers"
+        },
+        
+        "attributes": {
+          "type": "object",
+          "description": "Type-specific attributes",
+          "additionalProperties": true
+        },
+        
+        "confidence": {
+          "$ref": "#/definitions/confidenceLevel"
+        },
+        
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/evidence"
+          }
+        },
+        
+        "source_entities": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/uuid" },
+          "description": "Entities that led to discovering this one"
+        },
+        
+        "status": {
+          "type": "string",
+          "enum": ["ACTIVE", "VERIFIED", "DISPUTED", "DEPRECATED", "REMOVED"],
+          "default": "ACTIVE"
+        },
+        
+        "notes": {
+          "type": "string",
+          "maxLength": 10000
+        },
+        
+        "first_seen": {
+          "$ref": "#/definitions/timestamp"
+        },
+        
+        "last_seen": {
+          "$ref": "#/definitions/timestamp"
+        },
+        
+        "created_at": {
+          "$ref": "#/definitions/timestamp"
+        },
+        
+        "modified_at": {
+          "$ref": "#/definitions/timestamp"
+        },
+        
+        "version": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Entity revision number"
+        },
+        
+        "previous_versions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/entityVersion"
+          }
+        },
+        
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+
+    "entityVersion": {
+      "type": "object",
+      "properties": {
+        "version": { "type": "integer" },
+        "modified_at": { "$ref": "#/definitions/timestamp" },
+        "changes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "field": { "type": "string" },
+              "old_value": {},
+              "new_value": {}
+            }
+          }
+        }
+      }
+    },
+
+    "relationship": {
+      "type": "object",
+      "required": ["id", "source_id", "target_id", "type", "created_at"],
+      
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/uuid"
+        },
+        
+        "source_id": {
+          "$ref": "#/definitions/uuid",
+          "description": "Source entity ID"
+        },
+        
+        "target_id": {
+          "$ref": "#/definitions/uuid", 
+          "description": "Target entity ID"
+        },
+        
+        "type": {
+          "type": "string",
+          "enum": [
+            "OWNERSHIP",
+            "EMPLOYMENT",
+            "CONTACT",
+            "REGISTRATION",
+            "HOSTING",
+            "REFERENCES",
+            "CONTAINS",
+            "AUTHENTICATES",
+            "COMMUNICATES_WITH",
+            "LOCATED_AT",
+            "ASSOCIATED_WITH",
+            "ALIAS_OF",
+            "PARENT_OF",
+            "CHILD_OF",
+            "SIBLING_OF",
+            "CONFLICTS_WITH",
+            "CUSTOM"
+          ]
+        },
+        
+        "direction": {
+          "type": "string",
+          "enum": ["DIRECTED", "BIDIRECTIONAL"],
+          "default": "DIRECTED"
+        },
+        
+        "confidence": {
+          "$ref": "#/definitions/confidenceLevel"
+        },
+        
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/evidence"
+          }
+        },
+        
+        "attributes": {
+          "type": "object",
+          "description": "Relationship-specific attributes (e.g., start_date, end_date for employment)"
+        },
+        
+        "created_at": {
+          "$ref": "#/definitions/timestamp"
+        },
+        
+        "modified_at": {
+          "$ref": "#/definitions/timestamp"
+        },
+        
+        "verified": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+
+    "evidence": {
+      "type": "object",
+      "required": ["id", "type", "source", "captured_at"],
+      
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/uuid"
+        },
+        
+        "type": {
+          "$ref": "#/definitions/evidenceType"
+        },
+        
+        "source": {
+          "type": "string",
+          "description": "Source description (URL, document, etc.)"
+        },
+        
+        "source_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        
+        "source_reliability": {
+          "$ref": "#/definitions/sourceReliability"
+        },
+        
+        "content": {
+          "type": "string",
+          "description": "Actual evidence content or excerpt"
+        },
+        
+        "content_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "SHA-256 hash of content for integrity"
+        },
+        
+        "captured_at": {
+          "$ref": "#/definitions/timestamp"
+        },
+        
+        "archived_copy": {
+          "type": "string",
+          "description": "Path to archived snapshot"
+        },
+        
+        "corroborated_by": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/uuid" },
+          "description": "Other evidence IDs that corroborate this"
+        }
+      }
+    },
+
+    "evidenceChain": {
+      "type": "object",
+      "description": "Tracks how a conclusion was reached",
+      
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/uuid"
+        },
+        
+        "conclusion_entity_id": {
+          "$ref": "#/definitions/uuid"
+        },
+        
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "step_number": { "type": "integer" },
+              "entity_id": { "$ref": "#/definitions/uuid" },
+              "relationship_id": { "$ref": "#/definitions/uuid" },
+              "reasoning": { "type": "string" },
+              "evidence_id": { "$ref": "#/definitions/uuid" }
+            }
+          }
+        },
+        
+        "created_at": {
+          "$ref": "#/definitions/timestamp"
+        }
+      }
+    },
+
+    "auditEntry": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/uuid"
+        },
+        
+        "timestamp": {
+          "$ref": "#/definitions/timestamp"
+        },
+        
+        "action": {
+          "type": "string",
+          "enum": [
+            "ENTITY_CREATE",
+            "ENTITY_UPDATE",
+            "ENTITY_DELETE",
+            "RELATIONSHIP_CREATE",
+            "RELATIONSHIP_UPDATE", 
+            "RELATIONSHIP_DELETE",
+            "EVIDENCE_ADD",
+            "SEARCH_EXECUTE",
+            "SESSION_SAVE",
+            "SESSION_LOAD",
+            "EXPORT",
+            "IMPORT",
+            "MERGE"
+          ]
+        },
+        
+        "entity_id": {
+          "$ref": "#/definitions/uuid"
+        },
+        
+        "relationship_id": {
+          "$ref": "#/definitions/uuid"
+        },
+        
+        "details": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}

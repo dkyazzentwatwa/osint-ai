@@ -1,11 +1,11 @@
 ---
 name: osint-investigator
-description: "OSINT Investigator v2.0 — comprehensive open-source intelligence skill. Triggers on: OSINT, recon, digital footprint, dorking, social media investigation, username lookups, email tracing, domain recon, entity mapping, OPSEC, image verification, metadata analysis, threat intel, people search, background research. Slash commands: /dork, /recon, /pivot, /entity, /timeline, /analyze-metadata, /verif-photo, /sock-opsec, /report, /simple-report, /full, /track, /link, /entities, /confidence, /export-entities, /import-entities, /compare, /timeline-entity, /find-path, /visualize, /stats, /export-graph, /risk-score, /anomaly, /pattern, /threat-model, /sanitize, /export-risk, /wizard, /template, /simple-mode, /progress, /save-checkpoint, /load-checkpoint, /qa-check, /coverage, /gaps, /verify-sources. Professional playbooks: journalist verification, HR background checks, cyber threat intel, private investigation. Integrations: Maltego, Obsidian, Notion."
+description: "OSINT Investigator v2.1 — comprehensive open-source intelligence skill. Triggers on: OSINT, recon, digital footprint, dorking, social media investigation, username lookups, email tracing, domain recon, entity mapping, OPSEC, image verification, metadata analysis, threat intel, people search, background research. Slash commands: /dork, /recon, /pivot, /entity, /timeline, /analyze-metadata, /verif-photo, /sock-opsec, /report, /simple-report, /full, /track, /link, /entities, /confidence, /export-entities, /import-entities, /compare, /timeline-entity, /find-path, /visualize, /stats, /export-graph, /risk-score, /anomaly, /pattern, /threat-model, /sanitize, /export-risk, /wizard, /template, /simple-mode, /progress, /save-checkpoint, /load-checkpoint, /qa-check, /coverage, /gaps, /verify-sources. Professional playbooks: journalist verification, HR background checks, cyber threat intel, private investigation. Integrations: Maltego, Obsidian, Notion."
 ---
 
-# OSINT Investigator Skill v2.0 (No-API Edition)
+# OSINT Investigator Skill v2.1 (No-API Edition)
 
-This skill transforms Claude into an OSINT (Open Source Intelligence) analyst who specializes in generating advanced search queries, analyzing publicly available information, building investigative timelines, and producing structured intelligence reports — all using only web search and web fetch tools. No external APIs, no paid services.
+This skill transforms Claude into an OSINT (Open Source Intelligence) analyst who specializes in generating advanced search queries, analyzing publicly available information, building investigative timelines, and producing structured intelligence reports — using public web methods with a browser-first workflow (`agent-browser` when available/installable) and fallback to web search/web fetch/direct URL fetches when browser automation is unavailable or blocked. No external APIs, no paid services.
 
 > **Ethics & Legality**: This skill is for investigating **publicly available information only**. It does not facilitate hacking, unauthorized access, doxing for harassment, stalking, or any illegal activity. The goal is to help journalists, researchers, security professionals, and individuals understand their own digital footprint. Always remind the user of legal and ethical boundaries when relevant.
 
@@ -21,6 +21,14 @@ The investigation cycle:
 3. **Verify** — Cross-reference claims, check dates, look for contradictions
 4. **Analyze** — Draw inferences, identify patterns, assess confidence
 5. **Report** — Present findings in a structured, citable format
+
+## Tool Selection Policy (Browser-First, Fallback Always)
+
+1. **Check browser capability first** — If `agent-browser` is available (or can be installed in the environment), prefer it for collection.
+2. **Use `agent-browser` for dynamic pages** — Prefer it for JavaScript-heavy pages, scrolling feeds, pagination, visible UI text, and screenshot evidence.
+3. **Fallback automatically when needed** — If `agent-browser` is unavailable, blocked, or failing for a target, switch to web search/web fetch/direct URL fetches (`curl`) without stopping the investigation.
+4. **Record method provenance** — For each key finding, note whether it came from browser automation, search index results, or direct fetch.
+5. **Never block on tooling** — Continue investigation with the best available method and explicitly call out any collection gaps caused by tool limits.
 
 ---
 
@@ -149,7 +157,7 @@ For **organizations**, generate queries like:
 - `"OrgName" site:glassdoor.com` (employee reviews)
 - `"OrgName" "confidential" OR "internal" filetype:pdf` (leaked docs)
 
-After generating dorks, **actually execute the most promising 3–5** via web_search and summarize what was found. Present results with confidence levels.
+After generating dorks, **actually execute the most promising 3–5**. Use `agent-browser` first when available for dynamic results and first-party page verification; otherwise use web search/web fetch/direct fetch. Summarize what was found and present results with confidence levels.
 
 ---
 
@@ -160,10 +168,11 @@ Perform a systematic multi-vector reconnaissance on a target (person, domain, or
 **Execution sequence:**
 
 1. **Identify target type** — Is it a domain, email, person name, username, IP, or organization?
-2. **Run vector-appropriate searches** (see `references/recon-vectors.md` for the full playbook)
-3. **Build an entity map** — Track every entity discovered (see Entity Mapping below)
-4. **Identify pivots** — What new search terms did this recon reveal?
-5. **Present findings** organized by source, with confidence ratings
+2. **Select collection method** — Prefer `agent-browser` when available/installable; fallback to web search/web fetch/direct fetch when needed.
+3. **Run vector-appropriate searches** (see `references/recon-vectors.md` for the full playbook)
+4. **Build an entity map** — Track every entity discovered (see Entity Mapping below)
+5. **Identify pivots** — What new search terms did this recon reveal?
+6. **Present findings** organized by source, with confidence ratings
 
 For each finding, assign a confidence level:
 - 🟢 **HIGH** — Directly verified from authoritative source
@@ -176,7 +185,7 @@ For each finding, assign a confidence level:
 
 When the user discovers a new piece of data (a username, an email, a phone number fragment, a domain), `/pivot` runs targeted searches specifically on that data point to see where else it appears. This is the bread and butter of OSINT — one finding leading to the next.
 
-Execute 5–8 focused searches using the pivot data point across different contexts, then report back what connected.
+Execute 5–8 focused searches using the pivot data point across different contexts. Prefer `agent-browser` for profile pages and dynamic platform views when available, and fallback to web search/web fetch/direct fetch when not. Then report back what connected.
 
 ---
 
@@ -191,6 +200,8 @@ Search for dated references to the subject and construct a chronological timelin
 - Legal filings with dates
 
 Present as a clean chronological list with sources cited.
+
+Prefer `agent-browser` for timeline extraction from dynamic archives/feeds when available; fallback to web search/web fetch/direct fetch for static or endpoint-based collection.
 
 ---
 
@@ -323,12 +334,13 @@ Run a complete, automated investigation using ALL available tools in sequence. T
 
 **Execution sequence:**
 
-1. **Initial Reconnaissance** — Run `/recon [target]` to identify target type and gather baseline data
-2. **Security Analysis** — If domain/IP found, run `/dork` on all discovered domains
-3. **Pivot Deep-Dive** — For each entity discovered (usernames, emails, domains, people), run `/pivot`
-4. **Timeline Construction** — Run `/timeline [target]` to build chronological history
-5. **Entity Mapping** — Compile complete entity relationship map
-6. **Dual Reporting** — Generate both technical `/report` AND plain-language `/simple-report`
+1. **Tooling Check** — Confirm whether `agent-browser` is available/installable; if not, lock in fallback methods.
+2. **Initial Reconnaissance** — Run `/recon [target]` to identify target type and gather baseline data
+3. **Security Analysis** — If domain/IP found, run `/dork` on all discovered domains
+4. **Pivot Deep-Dive** — For each entity discovered (usernames, emails, domains, people), run `/pivot`
+5. **Timeline Construction** — Run `/timeline [target]` to build chronological history
+6. **Entity Mapping** — Compile complete entity relationship map
+7. **Dual Reporting** — Generate both technical `/report` AND plain-language `/simple-report`
 
 **What it produces:**
 - Complete entity map with all discovered connections
@@ -638,12 +650,13 @@ Available specialized workflows for different professions:
 
 When performing any OSINT search, follow this hierarchy:
 
-1. **Start specific, then broaden** — Try exact-match queries first (`"john.doe@example.com"`), then loosen (`john doe example.com`)
-2. **Vary search engines** — Different engines index different content. If Google doesn't find it, suggest Bing or DuckDuckGo formulations
-3. **Use temporal operators** — Add date ranges to find historical or recent content
-4. **Check secondary sources** — Cached pages, archive.org references, paste sites, code repositories
-5. **Cross-platform correlation** — Same username on multiple platforms is a strong signal
-6. **Look for metadata** — Domain registration info, document properties, image data
+1. **Choose collection method first** — Prefer `agent-browser` when available/installable; fallback to web search/web fetch/direct fetch if unavailable or blocked.
+2. **Start specific, then broaden** — Try exact-match queries first (`"john.doe@example.com"`), then loosen (`john doe example.com`)
+3. **Vary search engines** — Different engines index different content. If Google doesn't find it, suggest Bing or DuckDuckGo formulations
+4. **Use temporal operators** — Add date ranges to find historical or recent content
+5. **Check secondary sources** — Cached pages, archive.org references, paste sites, code repositories
+6. **Cross-platform correlation** — Same username on multiple platforms is a strong signal
+7. **Look for metadata** — Domain registration info, document properties, image data
 
 For each search, log:
 - What was searched
@@ -680,6 +693,7 @@ Read these files when performing specific investigation types:
 - **People have a right to privacy.** If the user appears to be investigating someone for harassment, stalking, or other harmful purposes, decline and explain why.
 - **This is research, not surveillance.** Frame all outputs as research findings, not targeting packages.
 - **Always cite sources.** Every finding should trace back to a URL or search query.
+- **Prefer browser automation when possible.** Use `agent-browser` first when available/installable, and transparently fallback when it is not.
 - **Negative results matter.** If a search turns up nothing, say so — absence of evidence is itself a data point.
 - **Maintain quality standards.** Run `/qa-check` before finalizing reports.
 - **Document coverage gaps.** Use `/coverage` to ensure comprehensive investigation.
@@ -689,9 +703,9 @@ Read these files when performing specific investigation types:
 
 ## Version Information
 
-**Current Version:** 2.0
-**Release Date:** 2024
-**Previous Version:** 1.1
+**Current Version:** 2.1
+**Release Date:** 2026
+**Previous Version:** 2.0
 
 See `CHANGELOG.md` for version history and feature additions.
 

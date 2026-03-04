@@ -61,10 +61,8 @@
 
 ```bash
 # Clone or download
-wget https://github.com/yourusername/osint-investigator/releases/download/v2.0/osint-investigator-v2.0.zip
 
 # Extract to your AI agent's skills directory
-unzip osint-investigator-v2.0.zip -d ~/.agents/skills/
 
 # Start investigating immediately - no API keys needed!
 ```

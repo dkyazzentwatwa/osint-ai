@@ -1,5 +1,13 @@
 # Example Investigation: Domain Security Audit (v2.0)
 
+> Canonical example: this file in `examples/` is the source of truth. `docs/examples/domain-security-audit.md` is a navigation mirror that should link here rather than maintain a second long-form copy.
+
+## Example Navigation
+
+- Canonical path: [`examples/domain-security-audit.md`](./domain-security-audit.md)
+- Docs mirror: [`docs/examples/domain-security-audit.md`](../docs/examples/domain-security-audit.md)
+- Related examples: [`examples/person-investigation.md`](./person-investigation.md) and [`examples/username-correlation.md`](./username-correlation.md)
+
 ## Target: example-startup.com
 
 **Scenario:** You're a security consultant doing due diligence before a client invests in a startup. This example shows v2.0 features including templates, risk assessment, visualization, and remediation workflows.

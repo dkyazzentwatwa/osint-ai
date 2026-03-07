@@ -1,5 +1,13 @@
 # Example Investigation: Username Correlation
 
+> Canonical example: this file in `examples/` is the source of truth. `docs/examples/username-correlation.md` is a navigation mirror that should link here rather than maintain a second long-form copy.
+
+## Example Navigation
+
+- Canonical path: [`examples/username-correlation.md`](./username-correlation.md)
+- Docs mirror: [`docs/examples/username-correlation.md`](../docs/examples/username-correlation.md)
+- Related examples: [`examples/domain-security-audit.md`](./domain-security-audit.md) and [`examples/person-investigation.md`](./person-investigation.md)
+
 ## Target: Username "cyberhacker99"
 
 ### Scenario

@@ -1,5 +1,13 @@
 # Example Investigation: Person Reconnaissance (v2.0)
 
+> Canonical example: this file in `examples/` is the source of truth. `docs/examples/person-investigation.md` is a navigation mirror that should link here rather than maintain a second long-form copy.
+
+## Example Navigation
+
+- Canonical path: [`examples/person-investigation.md`](./person-investigation.md)
+- Docs mirror: [`docs/examples/person-investigation.md`](../docs/examples/person-investigation.md)
+- Related examples: [`examples/domain-security-audit.md`](./domain-security-audit.md) and [`examples/username-correlation.md`](./username-correlation.md)
+
 ## Target: Tech Influencer "ExampleCorp"
 
 This example demonstrates the v2.0 features including wizards, risk assessment, visualization, and session management.

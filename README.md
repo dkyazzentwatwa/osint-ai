@@ -93,11 +93,11 @@ Runs complete investigation: recon → dork → pivot → timeline → generates
 ## Installation
 
 ```bash
-# Download
-wget https://github.com/yourusername/osint-investigator/releases/download/v2.0/osint-investigator-v2.0.zip
+# Clone
+git clone https://github.com/dkyazzentwatwa/osint-ai.git
 
-# Extract
-unzip osint-investigator-v2.0.zip -d ~/.agents/skills/
+# Enter the repository
+cd osint-ai
 
 # Start using immediately - no API keys needed!
 ```
@@ -190,9 +190,9 @@ unzip osint-investigator-v2.0.zip -d ~/.agents/skills/
 ### Getting Started
 | Document | Description |
 |----------|-------------|
-| [OSINT-BEGINNER-GUIDE.md](OSINT-BEGINNER-GUIDE.md) | Beginner-friendly tutorial |
+| [OSINT-BEGINNER-GUIDE.md](docs/OSINT-BEGINNER-GUIDE.md) | Beginner-friendly tutorial |
 | [SKILL.md](SKILL.md) | Complete command reference |
-| [OSINT-v2.0-RELEASE-NOTES.md](OSINT-v2.0-RELEASE-NOTES.md) | What's new in v2.0 |
+| [OSINT-v2.0-RELEASE-NOTES.md](docs/OSINT-v2.0-RELEASE-NOTES.md) | What's new in v2.0 |
 
 ### Core Systems
 | Document | Description |
@@ -244,8 +244,8 @@ unzip osint-investigator-v2.0.zip -d ~/.agents/skills/
 |----------|-------------|
 | [references/recon-vectors.md](references/recon-vectors.md) | Investigation playbooks |
 | [references/dork-library.md](references/dork-library.md) | Google dork patterns |
-| [advanced-user-guide.md](advanced-user-guide.md) | Power user guide |
-| [troubleshooting.md](troubleshooting.md) | FAQ & solutions |
+| [advanced-user-guide.md](docs/advanced-user-guide.md) | Power user guide |
+| [troubleshooting.md](docs/troubleshooting.md) | FAQ & solutions |
 
 ---
 
@@ -293,7 +293,7 @@ unzip osint-investigator-v2.0.zip -d ~/.agents/skills/
 
 ## Contributing
 
-Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions welcome! See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for guidelines.
 
 Priority areas:
 - New dork patterns for emerging platforms
@@ -311,10 +311,10 @@ MIT License - See [LICENSE](LICENSE) file
 
 ## Support
 
-- 📖 [Beginner's Guide](OSINT-BEGINNER-GUIDE.md)
-- 📋 [Release Notes](OSINT-v2.0-RELEASE-NOTES.md)
-- 🔧 [Troubleshooting](troubleshooting.md)
-- 🐛 [Open an Issue](https://github.com/yourusername/osint-investigator/issues)
+- 📖 [Beginner's Guide](docs/OSINT-BEGINNER-GUIDE.md)
+- 📋 [Release Notes](docs/OSINT-v2.0-RELEASE-NOTES.md)
+- 🔧 [Troubleshooting](docs/troubleshooting.md)
+- 🐛 [Open an Issue](https://github.com/dkyazzentwatwa/osint-ai/issues)
 
 ---
 
